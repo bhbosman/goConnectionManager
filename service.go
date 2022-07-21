@@ -24,7 +24,7 @@ type Service struct {
 	ConnectionHelper  IHelper
 	pubSub            *pubsub.PubSub
 	goFunctionCounter GoFunctionCounter.IService
-	subscribeChannel  chan interface{}
+	subscribeChannel  *pubsub.ChannelSubscription
 }
 
 func (self *Service) ServiceName() string {
@@ -136,7 +136,7 @@ func (self *Service) goStart(instanceData IData) {
 		for range cmdChannel {
 		}
 	}(self.cmdChannel)
-	self.subscribeChannel = make(chan interface{}, 32)
+	self.subscribeChannel = pubsub.NewChannelSubscription(32)
 	self.pubSub.AddSub(self.subscribeChannel, self.ConnectionHelper.RefreshChannelName())
 
 	channelHandlerCallback := ChannelHandler.CreateChannelHandlerCallback(
@@ -163,7 +163,7 @@ func (self *Service) goStart(instanceData IData) {
 			},
 		},
 		func() int {
-			n := len(self.cmdChannel) + len(self.subscribeChannel)
+			n := len(self.cmdChannel) + self.subscribeChannel.Count()
 			return n
 		},
 		goCommsDefinitions.CreateTryNextFunc(self.cmdChannel),
@@ -195,7 +195,7 @@ loop:
 			if err != nil || breakLoop {
 				break loop
 			}
-		case event, ok := <-self.subscribeChannel:
+		case event, ok := <-self.subscribeChannel.Data:
 			if !ok {
 				return
 			}
