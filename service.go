@@ -136,8 +136,8 @@ func (self *Service) goStart(instanceData IData) {
 		for range cmdChannel {
 		}
 	}(self.cmdChannel)
-
-	self.subscribeChannel = self.pubSub.Sub(self.ConnectionHelper.RefreshChannelName())
+	self.subscribeChannel = make(chan interface{}, 32)
+	self.pubSub.AddSub(self.subscribeChannel, self.ConnectionHelper.RefreshChannelName())
 
 	channelHandlerCallback := ChannelHandler.CreateChannelHandlerCallback(
 		self.ctx,
