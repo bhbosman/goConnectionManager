@@ -242,18 +242,6 @@ func (self *data) handleRefreshDataTo(msg *RefreshDataTo) {
 }
 
 func (self *data) handleEmptyQueue(msg *messages.EmptyQueue) error {
-	if self.appContext.Err() != nil {
-		self.logger.Error(
-			"App Context in Error",
-			zap.String("Method", "handleEmptyQueue"),
-			zap.Error(self.appContext.Err()))
-		return self.appContext.Err()
-	}
-	self.logger.Info("",
-		zap.String("Method", "handleEmptyQueue"),
-		zap.Int("Count", msg.Count),
-		zap.Int("Overall", msg.OverallCount))
-
 	for s, b := range self.dirtyMap {
 		if b {
 			if connInfo, ok := self.connectionMap[s]; ok {
