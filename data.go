@@ -72,12 +72,12 @@ func (self *data) CloseAllConnections(_ context.Context) error {
 }
 
 func (self *data) CloseConnection(id string) error {
-	if self.appContext.Err() != nil {
+	if err := self.appContext.Err(); err != nil {
 		self.logger.Error(
 			"App Context in Error",
 			zap.String("Method", "CloseConnection"),
-			zap.Error(self.appContext.Err()))
-		return self.appContext.Err()
+			zap.Error(err))
+		return err
 	}
 	self.logger.Info(
 		"",
