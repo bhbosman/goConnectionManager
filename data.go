@@ -29,8 +29,8 @@ func (self *data) Send(message interface{}) error {
 			zap.Error(self.appContext.Err()))
 		return self.appContext.Err()
 	}
-	_, err := self.messageRouter.Route(message)
-	return err
+	self.messageRouter.Route(message)
+	return nil
 }
 
 func (self *data) ShutDown() error {
