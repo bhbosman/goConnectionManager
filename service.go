@@ -167,14 +167,6 @@ func (self *Service) goStart(instanceData IData) {
 			return n
 		},
 		goCommsDefinitions.CreateTryNextFunc(self.cmdChannel),
-		//func(i interface{}) {
-		//	select {
-		//	case self.cmdChannel <- i:
-		//		break
-		//	default:
-		//		break
-		//	}
-		//},
 	)
 loop:
 	for {
