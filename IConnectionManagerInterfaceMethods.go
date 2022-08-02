@@ -471,6 +471,96 @@ func CallIConnectionManagerGetConnections(context context.Context, channel chan<
 	return v, nil
 }
 
+// Interface IConnectionManager, Method: MultiSend
+type IConnectionManagerMultiSendIn struct {
+	arg0 []interface{}
+}
+
+type IConnectionManagerMultiSendOut struct {
+}
+type IConnectionManagerMultiSendError struct {
+	InterfaceName string
+	MethodName    string
+	Reason        string
+}
+
+func (self *IConnectionManagerMultiSendError) Error() string {
+	return fmt.Sprintf("error in data coming back from %v::%v. Reason: %v", self.InterfaceName, self.MethodName, self.Reason)
+}
+
+type IConnectionManagerMultiSend struct {
+	inData         IConnectionManagerMultiSendIn
+	outDataChannel chan IConnectionManagerMultiSendOut
+}
+
+func NewIConnectionManagerMultiSend(waitToComplete bool, arg0 ...interface{}) *IConnectionManagerMultiSend {
+	var outDataChannel chan IConnectionManagerMultiSendOut
+	if waitToComplete {
+		outDataChannel = make(chan IConnectionManagerMultiSendOut)
+	} else {
+		outDataChannel = nil
+	}
+	return &IConnectionManagerMultiSend{
+		inData: IConnectionManagerMultiSendIn{
+			arg0: arg0,
+		},
+		outDataChannel: outDataChannel,
+	}
+}
+
+func (self *IConnectionManagerMultiSend) Wait(onError func(interfaceName string, methodName string, err error) error) (IConnectionManagerMultiSendOut, error) {
+	data, ok := <-self.outDataChannel
+	if !ok {
+		generatedError := &IConnectionManagerMultiSendError{
+			InterfaceName: "IConnectionManager",
+			MethodName:    "MultiSend",
+			Reason:        "Channel for IConnectionManager::MultiSend returned false",
+		}
+		if onError != nil {
+			err := onError("IConnectionManager", "MultiSend", generatedError)
+			return IConnectionManagerMultiSendOut{}, err
+		} else {
+			return IConnectionManagerMultiSendOut{}, generatedError
+		}
+	}
+	return data, nil
+}
+
+func (self *IConnectionManagerMultiSend) Close() error {
+	close(self.outDataChannel)
+	return nil
+}
+func CallIConnectionManagerMultiSend(context context.Context, channel chan<- interface{}, waitToComplete bool, arg0 ...interface{}) (IConnectionManagerMultiSendOut, error) {
+	if context != nil && context.Err() != nil {
+		return IConnectionManagerMultiSendOut{}, context.Err()
+	}
+	data := NewIConnectionManagerMultiSend(waitToComplete, arg0...)
+	if waitToComplete {
+		defer func(data *IConnectionManagerMultiSend) {
+			err := data.Close()
+			if err != nil {
+			}
+		}(data)
+	}
+	if context != nil && context.Err() != nil {
+		return IConnectionManagerMultiSendOut{}, context.Err()
+	}
+	channel <- data
+	var err error
+	var v IConnectionManagerMultiSendOut
+	if waitToComplete {
+		v, err = data.Wait(func(interfaceName string, methodName string, err error) error {
+			return err
+		})
+	} else {
+		err = errors.NoWaitOperationError
+	}
+	if err != nil {
+		return IConnectionManagerMultiSendOut{}, err
+	}
+	return v, nil
+}
+
 // Interface IConnectionManager, Method: NameConnection
 type IConnectionManagerNameConnectionIn struct {
 	arg0 string
@@ -659,6 +749,97 @@ func CallIConnectionManagerRegisterConnection(context context.Context, channel c
 	return v, nil
 }
 
+// Interface IConnectionManager, Method: Send
+type IConnectionManagerSendIn struct {
+	arg0 interface{}
+}
+
+type IConnectionManagerSendOut struct {
+	Args0 error
+}
+type IConnectionManagerSendError struct {
+	InterfaceName string
+	MethodName    string
+	Reason        string
+}
+
+func (self *IConnectionManagerSendError) Error() string {
+	return fmt.Sprintf("error in data coming back from %v::%v. Reason: %v", self.InterfaceName, self.MethodName, self.Reason)
+}
+
+type IConnectionManagerSend struct {
+	inData         IConnectionManagerSendIn
+	outDataChannel chan IConnectionManagerSendOut
+}
+
+func NewIConnectionManagerSend(waitToComplete bool, arg0 interface{}) *IConnectionManagerSend {
+	var outDataChannel chan IConnectionManagerSendOut
+	if waitToComplete {
+		outDataChannel = make(chan IConnectionManagerSendOut)
+	} else {
+		outDataChannel = nil
+	}
+	return &IConnectionManagerSend{
+		inData: IConnectionManagerSendIn{
+			arg0: arg0,
+		},
+		outDataChannel: outDataChannel,
+	}
+}
+
+func (self *IConnectionManagerSend) Wait(onError func(interfaceName string, methodName string, err error) error) (IConnectionManagerSendOut, error) {
+	data, ok := <-self.outDataChannel
+	if !ok {
+		generatedError := &IConnectionManagerSendError{
+			InterfaceName: "IConnectionManager",
+			MethodName:    "Send",
+			Reason:        "Channel for IConnectionManager::Send returned false",
+		}
+		if onError != nil {
+			err := onError("IConnectionManager", "Send", generatedError)
+			return IConnectionManagerSendOut{}, err
+		} else {
+			return IConnectionManagerSendOut{}, generatedError
+		}
+	}
+	return data, nil
+}
+
+func (self *IConnectionManagerSend) Close() error {
+	close(self.outDataChannel)
+	return nil
+}
+func CallIConnectionManagerSend(context context.Context, channel chan<- interface{}, waitToComplete bool, arg0 interface{}) (IConnectionManagerSendOut, error) {
+	if context != nil && context.Err() != nil {
+		return IConnectionManagerSendOut{}, context.Err()
+	}
+	data := NewIConnectionManagerSend(waitToComplete, arg0)
+	if waitToComplete {
+		defer func(data *IConnectionManagerSend) {
+			err := data.Close()
+			if err != nil {
+			}
+		}(data)
+	}
+	if context != nil && context.Err() != nil {
+		return IConnectionManagerSendOut{}, context.Err()
+	}
+	channel <- data
+	var err error
+	var v IConnectionManagerSendOut
+	if waitToComplete {
+		v, err = data.Wait(func(interfaceName string, methodName string, err error) error {
+			return err
+		})
+	} else {
+		err = errors.NoWaitOperationError
+	}
+	if err != nil {
+		return IConnectionManagerSendOut{}, err
+	}
+	return v, nil
+}
+
 func ChannelEventsForIConnectionManager(next IConnectionManager, event interface{}) (bool, error) {
 	switch v := event.(type) {
 	case *IConnectionManagerCloseAllConnections:
@@ -696,6 +877,13 @@ func ChannelEventsForIConnectionManager(next IConnectionManager, event interface
 			v.outDataChannel <- data
 		}
 		return true, nil
+	case *IConnectionManagerMultiSend:
+		data := IConnectionManagerMultiSendOut{}
+		next.MultiSend(v.inData.arg0...)
+		if v.outDataChannel != nil {
+			v.outDataChannel <- data
+		}
+		return true, nil
 	case *IConnectionManagerNameConnection:
 		data := IConnectionManagerNameConnectionOut{}
 		data.Args0 = next.NameConnection(v.inData.arg0, v.inData.arg1)
@@ -706,6 +894,13 @@ func ChannelEventsForIConnectionManager(next IConnectionManager, event interface
 	case *IConnectionManagerRegisterConnection:
 		data := IConnectionManagerRegisterConnectionOut{}
 		data.Args0 = next.RegisterConnection(v.inData.arg0, v.inData.arg1, v.inData.arg2)
+		if v.outDataChannel != nil {
+			v.outDataChannel <- data
+		}
+		return true, nil
+	case *IConnectionManagerSend:
+		data := IConnectionManagerSendOut{}
+		data.Args0 = next.Send(v.inData.arg0)
 		if v.outDataChannel != nil {
 			v.outDataChannel <- data
 		}

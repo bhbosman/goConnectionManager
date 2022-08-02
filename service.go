@@ -27,6 +27,21 @@ type Service struct {
 	subscribeChannel  *pubsub.ChannelSubscription
 }
 
+func (self *Service) Send(message interface{}) error {
+	result, err := CallIConnectionManagerSend(self.ctx, self.cmdChannel, false, message)
+	if err != nil {
+		return err
+	}
+	return result.Args0
+}
+
+func (self *Service) MultiSend(messages ...interface{}) {
+	_, err := CallIConnectionManagerMultiSend(self.ctx, self.cmdChannel, false, messages...)
+	if err != nil {
+		return
+	}
+}
+
 func (self *Service) ServiceName() string {
 	return "ConnectionManager"
 }

@@ -2,6 +2,7 @@ package goConnectionManager
 
 import (
 	"github.com/bhbosman/gocommon/model"
+	"github.com/bhbosman/gocommon/services/ISendMessage"
 )
 
 type IPublishConnectionInformation interface {
@@ -9,6 +10,8 @@ type IPublishConnectionInformation interface {
 }
 
 type IConnectionManager interface {
+	ISendMessage.ISendMessage
+	ISendMessage.IMultiSendMessage
 	IPublishConnectionInformation
 	model.IRegisterToConnectionManager
 	IObtainConnectionManagerInformation

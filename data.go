@@ -21,6 +21,10 @@ type data struct {
 	goFunctionCounter       GoFunctionCounter.IService
 }
 
+func (self *data) MultiSend(messages ...interface{}) {
+	self.messageRouter.MultiRoute(messages...)
+}
+
 func (self *data) Send(message interface{}) error {
 	if self.appContext.Err() != nil {
 		self.logger.Error(
@@ -198,12 +202,6 @@ func (self *data) ConnectionInformationReceived(counters *model.PublishRxHandler
 	return nil
 }
 func (self *data) handleRefreshDataTo(msg *RefreshDataTo) {
-	self.ConnectionManagerHelper.Pub(
-		&RefreshDataStart{
-			SubscriptionName: msg.SubscriptionName,
-		},
-		msg.SubscriptionName,
-	)
 	for _, cm := range self.connectionMap {
 
 		gridData := make([]model.LineData, len(cm.Grid), len(cm.Grid))
@@ -211,7 +209,7 @@ func (self *data) handleRefreshDataTo(msg *RefreshDataTo) {
 			gridData[i] = *lineData
 		}
 
-		self.ConnectionManagerHelper.Pub(
+		msg.PubSubBag.Add(
 			model.NewConnectionCreated(
 				cm.Id,
 				cm.Name,
@@ -219,8 +217,8 @@ func (self *data) handleRefreshDataTo(msg *RefreshDataTo) {
 				cm.ConnectionTime,
 				cm.CancelContext,
 			),
-			msg.SubscriptionName)
-		self.ConnectionManagerHelper.Pub(
+		)
+		msg.PubSubBag.Add(
 			&model.ConnectionState{
 				ConnectionId:   cm.Id,
 				CancelContext:  cm.CancelContext,
@@ -229,16 +227,8 @@ func (self *data) handleRefreshDataTo(msg *RefreshDataTo) {
 				ConnectionTime: cm.ConnectionTime,
 				Grid:           gridData,
 			},
-			msg.SubscriptionName,
 		)
-
 	}
-	self.ConnectionManagerHelper.Pub(
-		&RefreshDataStop{
-			SubscriptionName: msg.SubscriptionName,
-		},
-		msg.SubscriptionName,
-	)
 }
 
 func (self *data) handleEmptyQueue(msg *messages.EmptyQueue) error {
@@ -249,7 +239,7 @@ func (self *data) handleEmptyQueue(msg *messages.EmptyQueue) error {
 				for i, lineData := range connInfo.Grid {
 					gridData[i] = *lineData
 				}
-				self.publishMessage(
+				msg.ErrorHappen = !self.publishMessage(
 					&model.ConnectionState{
 						ConnectionId:   connInfo.Id,
 						CancelContext:  connInfo.CancelContext,
@@ -266,8 +256,8 @@ func (self *data) handleEmptyQueue(msg *messages.EmptyQueue) error {
 	return nil
 }
 
-func (self *data) publishMessage(msg interface{}) {
-	self.ConnectionManagerHelper.Pub(
+func (self *data) publishMessage(msg interface{}) bool {
+	return self.ConnectionManagerHelper.Pub(
 		msg,
 		self.ConnectionManagerHelper.PublishChannelName(),
 	)

@@ -1,21 +1,24 @@
 package goConnectionManager
 
-import "github.com/cskr/pubsub"
+import (
+	"github.com/bhbosman/goCommsDefinitions"
+	"github.com/cskr/pubsub"
+)
 
 type Helper struct {
 	pubSub *pubsub.PubSub
 }
 
-type RefreshDataStart struct {
-	SubscriptionName string
-}
+//type RefreshDataStart struct {
+//	SubscriptionName string
+//}
 
-type RefreshDataStop struct {
-	SubscriptionName string
-}
+//type RefreshDataStop struct {
+//	SubscriptionName string
+//}
 
 type RefreshDataTo struct {
-	SubscriptionName string
+	PubSubBag goCommsDefinitions.IPubSubBag
 }
 
 func (self *Helper) RefreshChannelName() string {
@@ -26,18 +29,8 @@ func (self *Helper) Close() error {
 	return nil
 }
 
-func (self *Helper) RefreshData(subscriptionName string) {
-	self.pubSub.Pub(
-		&RefreshDataTo{
-			SubscriptionName: subscriptionName,
-		},
-		self.RefreshChannelName(),
-	)
-
-}
-
-func (self *Helper) Pub(msg interface{}, topics ...string) {
-	self.pubSub.Pub(msg, topics...)
+func (self *Helper) Pub(msg interface{}, topics ...string) bool {
+	return self.pubSub.PubWithContext(msg, topics...)
 }
 
 func (self *Helper) PublishChannelName() string {
