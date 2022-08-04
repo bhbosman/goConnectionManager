@@ -9,6 +9,7 @@ import (
 	"go.uber.org/multierr"
 	"go.uber.org/zap"
 	"math"
+	"sort"
 )
 
 type data struct {
@@ -280,6 +281,7 @@ func (self *data) buildKeyValueData(cm *model.ConnectionInformation) []model.Key
 	for key, _ := range cm.KeyValuesMap {
 		keys = append(keys, key)
 	}
+	sort.Strings(keys)
 	result := make([]model.KeyValue, len(keys))
 	for i, key := range keys {
 		value, _ := cm.KeyValuesMap[key]
