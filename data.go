@@ -196,6 +196,13 @@ func (self *data) ConnectionInformationReceived(counters *model.PublishRxHandler
 				grid[index].InValue = counter.Data
 			}
 			connectionInformation.Grid = grid
+			connectionInformation.KeyValuesMap = make(map[string]string)
+			for key, value := range connectionInformation.InboundCounters.Data {
+				connectionInformation.KeyValuesMap[key] = value
+			}
+			for key, value := range connectionInformation.OutboundCounters.Data {
+				connectionInformation.KeyValuesMap[key] = value
+			}
 		}
 		self.dirtyMap[counters.ConnectionId] = true
 	}
@@ -203,11 +210,6 @@ func (self *data) ConnectionInformationReceived(counters *model.PublishRxHandler
 }
 func (self *data) handleRefreshDataTo(msg *RefreshDataTo) {
 	for _, cm := range self.connectionMap {
-
-		gridData := make([]model.LineData, len(cm.Grid), len(cm.Grid))
-		for i, lineData := range cm.Grid {
-			gridData[i] = *lineData
-		}
 
 		msg.PubSubBag.Add(
 			model.NewConnectionCreated(
@@ -225,7 +227,8 @@ func (self *data) handleRefreshDataTo(msg *RefreshDataTo) {
 				CancelFunc:     cm.CancelFunc,
 				Name:           cm.Name,
 				ConnectionTime: cm.ConnectionTime,
-				Grid:           gridData,
+				Grid:           self.buildGridData(cm),
+				KeyValue:       self.buildKeyValueData(cm),
 			},
 		)
 	}
@@ -235,10 +238,6 @@ func (self *data) handleEmptyQueue(msg *messages.EmptyQueue) error {
 	for s, b := range self.dirtyMap {
 		if b {
 			if connInfo, ok := self.connectionMap[s]; ok {
-				gridData := make([]model.LineData, len(connInfo.Grid), len(connInfo.Grid))
-				for i, lineData := range connInfo.Grid {
-					gridData[i] = *lineData
-				}
 				msg.ErrorHappen = !self.publishMessage(
 					&model.ConnectionState{
 						ConnectionId:   connInfo.Id,
@@ -246,7 +245,8 @@ func (self *data) handleEmptyQueue(msg *messages.EmptyQueue) error {
 						CancelFunc:     connInfo.CancelFunc,
 						Name:           connInfo.Name,
 						ConnectionTime: connInfo.ConnectionTime,
-						Grid:           gridData,
+						Grid:           self.buildGridData(connInfo),
+						KeyValue:       self.buildKeyValueData(connInfo),
 					})
 			}
 		}
@@ -265,6 +265,30 @@ func (self *data) publishMessage(msg interface{}) bool {
 
 func (self *data) publishDirtyList() {
 
+}
+
+func (self *data) buildGridData(cm *model.ConnectionInformation) []model.LineData {
+	gridData := make([]model.LineData, len(cm.Grid), len(cm.Grid))
+	for i, lineData := range cm.Grid {
+		gridData[i] = *lineData
+	}
+	return gridData
+}
+
+func (self *data) buildKeyValueData(cm *model.ConnectionInformation) []model.KeyValue {
+	keys := make([]string, 0, len(cm.KeyValuesMap))
+	for key, _ := range cm.KeyValuesMap {
+		keys = append(keys, key)
+	}
+	result := make([]model.KeyValue, len(keys))
+	for i, key := range keys {
+		value, _ := cm.KeyValuesMap[key]
+		result[i] = model.KeyValue{
+			Key:   key,
+			Value: value,
+		}
+	}
+	return result
 }
 
 func newData(
