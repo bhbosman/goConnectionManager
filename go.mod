@@ -7,9 +7,9 @@ require (
 	github.com/bhbosman/gocommon v0.0.0-20220627073905-4951fb81c325
 	github.com/cskr/pubsub v1.0.2
 	github.com/golang/mock v1.6.0
-	go.uber.org/fx v1.18.2
+	go.uber.org/fx v1.19.2
 	go.uber.org/multierr v1.6.0
-	go.uber.org/zap v1.21.0
+	go.uber.org/zap v1.23.0
 )
 
 require (
@@ -20,11 +20,11 @@ require (
 	github.com/icza/gox v0.0.0-20220321141217-e2d488ab2fbc // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/reactivex/rxgo/v2 v2.5.0 // indirect
-	github.com/stretchr/objx v0.1.0 // indirect
-	github.com/stretchr/testify v1.7.1 // indirect
+	github.com/stretchr/objx v0.4.0 // indirect
+	github.com/stretchr/testify v1.8.0 // indirect
 	github.com/teivah/onecontext v0.0.0-20200513185103-40f981bfd775 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
-	go.uber.org/dig v1.15.0 // indirect
+	go.uber.org/dig v1.16.1 // indirect
 	golang.org/x/net v0.0.0-20211015210444-4f30a5c0130f // indirect
 	golang.org/x/sys v0.0.0-20220318055525-2edf467146b5 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
@@ -36,4 +36,4 @@ replace github.com/bhbosman/gocommon => ../gocommon
 
 replace github.com/bhbosman/goCommsDefinitions => ../goCommsDefinitions
 
-replace github.com/cskr/pubsub => ../pubsub
+replace github.com/cskr/pubsub => github.com/bhbosman/pubsub v1.0.3-0.20220802200819-029949e8a8af
