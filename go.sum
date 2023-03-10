@@ -7,8 +7,9 @@ github.com/bhbosman/gomock v1.6.1-0.20230302060806-d02c40b7514e h1:9ZZLTcBpRq0gC
 github.com/bhbosman/gomock v1.6.1-0.20230302060806-d02c40b7514e/go.mod h1:YKHw244p9LQrfV48xfFMiAVbFE2qjBuU1OHTNjXwboE=
 github.com/bhbosman/pubsub v1.0.3-0.20220802200819-029949e8a8af h1:OkZ6Yjh5lWL1cD6FTeHe+cBCiWS+ofJYwlO/GUx880c=
 github.com/bhbosman/pubsub v1.0.3-0.20220802200819-029949e8a8af/go.mod h1:uflhLeXzvTqu2aIOB7S7LvtVBnLzDluyHbBYwrPZfWc=
-github.com/cenkalti/backoff/v4 v4.0.0 h1:6VeaLF9aI+MAUQ95106HwWzYZgJJpZ4stumjj6RFYAU=
 github.com/cenkalti/backoff/v4 v4.0.0/go.mod h1:eEew/i+1Q6OrCDZh3WiXYv3+nJwBASZ8Bog/87DQnVg=
+github.com/cenkalti/backoff/v4 v4.1.1 h1:G2HAfAmvm/GcKan2oOQpBXOd2tT2G57ZnZGWa1PxPBQ=
+github.com/cenkalti/backoff/v4 v4.1.1/go.mod h1:scbssz8iZGpm3xbr14ovlUdkxfGXNInqkPWOWmG2CLw=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

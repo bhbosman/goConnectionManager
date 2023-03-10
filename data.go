@@ -253,7 +253,6 @@ func (self *data) handleEmptyQueue(msg *messages.EmptyQueue) error {
 		}
 	}
 	self.dirtyMap = make(map[string]bool)
-
 	return nil
 }
 
