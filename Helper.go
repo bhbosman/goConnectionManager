@@ -9,14 +9,6 @@ type Helper struct {
 	pubSub *pubsub.PubSub
 }
 
-//type RefreshDataStart struct {
-//	SubscriptionName string
-//}
-
-//type RefreshDataStop struct {
-//	SubscriptionName string
-//}
-
 type RefreshDataTo struct {
 	PubSubBag goCommsDefinitions.IPubSubBag
 }
