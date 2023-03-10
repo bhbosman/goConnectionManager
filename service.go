@@ -2,6 +2,7 @@ package goConnectionManager
 
 import (
 	"context"
+	"fmt"
 	"github.com/bhbosman/goCommsDefinitions"
 	"github.com/bhbosman/gocommon/ChannelHandler"
 	"github.com/bhbosman/gocommon/GoFunctionCounter"
@@ -10,16 +11,17 @@ import (
 	"github.com/bhbosman/gocommon/pubSub"
 	"github.com/bhbosman/gocommon/services/ISendMessage"
 	"github.com/cskr/pubsub"
+	"github.com/reactivex/rxgo/v2"
 	"go.uber.org/zap"
 )
 
-type Service struct {
+type service struct {
 	parentContext     context.Context
 	ctx               context.Context
 	cancelFunc        context.CancelFunc
 	cmdChannel        chan interface{}
 	onData            func() (IData, error)
-	Logger            *zap.Logger
+	logger            *zap.Logger
 	state             IFxService.State
 	ConnectionHelper  IHelper
 	pubSub            *pubsub.PubSub
@@ -27,7 +29,7 @@ type Service struct {
 	subscribeChannel  *pubsub.NextFuncSubscription
 }
 
-func (self *Service) Send(message interface{}) error {
+func (self *service) Send(message interface{}) error {
 	result, err := CallIConnectionManagerSend(self.ctx, self.cmdChannel, false, message)
 	if err != nil {
 		return err
@@ -35,22 +37,22 @@ func (self *Service) Send(message interface{}) error {
 	return result.Args0
 }
 
-func (self *Service) MultiSend(messages ...interface{}) {
+func (self *service) MultiSend(messages ...interface{}) {
 	_, err := CallIConnectionManagerMultiSend(self.ctx, self.cmdChannel, false, messages...)
 	if err != nil {
 		return
 	}
 }
 
-func (self *Service) ServiceName() string {
+func (self *service) ServiceName() string {
 	return "ConnectionManager"
 }
 
-func (self *Service) State() IFxService.State {
+func (self *service) State() IFxService.State {
 	return self.state
 }
 
-func (self *Service) ConnectionInformationReceived(counters *model2.PublishRxHandlerCounters) error {
+func (self *service) ConnectionInformationReceived(counters *model2.PublishRxHandlerCounters) error {
 	result, err := CallIConnectionManagerConnectionInformationReceived(
 		self.ctx, self.cmdChannel, true,
 		counters)
@@ -60,7 +62,7 @@ func (self *Service) ConnectionInformationReceived(counters *model2.PublishRxHan
 	return result.Args0
 }
 
-func (self *Service) CloseAllConnections(ctx context.Context) error {
+func (self *service) CloseAllConnections(ctx context.Context) error {
 	result, err := CallIConnectionManagerCloseAllConnections(self.ctx, self.cmdChannel, true, ctx)
 	if err != nil {
 		return err
@@ -68,7 +70,7 @@ func (self *Service) CloseAllConnections(ctx context.Context) error {
 	return result.Args0
 }
 
-func (self *Service) CloseConnection(id string) error {
+func (self *service) CloseConnection(id string) error {
 	result, err := CallIConnectionManagerCloseConnection(self.ctx, self.cmdChannel, true, id)
 	if err != nil {
 		return err
@@ -76,7 +78,7 @@ func (self *Service) CloseConnection(id string) error {
 	return result.Args0
 }
 
-func (self *Service) GetConnections(ctx context.Context) ([]*model2.ConnectionInformation, error) {
+func (self *service) GetConnections(ctx context.Context) ([]*model2.ConnectionInformation, error) {
 	result, err := CallIConnectionManagerGetConnections(self.ctx, self.cmdChannel, true, ctx)
 	if err != nil {
 		return nil, err
@@ -84,7 +86,7 @@ func (self *Service) GetConnections(ctx context.Context) ([]*model2.ConnectionIn
 	return result.Args0, result.Args1
 }
 
-func (self *Service) NameConnection(id string, connectionName string) error {
+func (self *service) NameConnection(id string, connectionName string) error {
 	result, err := CallIConnectionManagerNameConnection(self.ctx, self.cmdChannel, true,
 		id, connectionName)
 	if err != nil {
@@ -93,7 +95,7 @@ func (self *Service) NameConnection(id string, connectionName string) error {
 	return result.Args0
 }
 
-func (self *Service) OnStart(ctx context.Context) error {
+func (self *service) OnStart(ctx context.Context) error {
 	err := self.start(ctx)
 	if err != nil {
 		return err
@@ -102,23 +104,43 @@ func (self *Service) OnStart(ctx context.Context) error {
 	return nil
 }
 
-func (self *Service) OnStop(ctx context.Context) error {
+func (self *service) OnStop(ctx context.Context) error {
 	err := self.shutdown(ctx)
+	self.cmdChannel <- 222
+	self.cmdChannel <- 222
+	self.cmdChannel <- 222
 	close(self.cmdChannel)
+	for _ = range self.cmdChannel {
+		fmt.Sprintf("dddd")
+	}
 	self.state = IFxService.Stopped
 	return err
 }
 
-func (self *Service) RegisterConnection(id string, function context.CancelFunc, CancelContext context.Context) error {
-	result, err := CallIConnectionManagerRegisterConnection(self.ctx, self.cmdChannel, true,
-		id, function, CancelContext)
+func (self *service) RegisterConnection(
+	id string,
+	function context.CancelFunc,
+	CancelContext context.Context,
+	nextFuncOutBoundChannel rxgo.NextFunc,
+	nextFuncInBoundChannel rxgo.NextFunc,
+) error {
+	result, err := CallIConnectionManagerRegisterConnection(
+		self.ctx,
+		self.cmdChannel,
+		true,
+		id,
+		function,
+		CancelContext,
+		nextFuncOutBoundChannel,
+		nextFuncInBoundChannel,
+	)
 	if err != nil {
 		return err
 	}
 	return result.Args0
 }
 
-func (self *Service) DeregisterConnection(id string) error {
+func (self *service) DeregisterConnection(id string) error {
 	result, err := CallIConnectionManagerDeregisterConnection(self.ctx, self.cmdChannel, true, id)
 	if err != nil {
 		return err
@@ -126,12 +148,12 @@ func (self *Service) DeregisterConnection(id string) error {
 	return result.Args0
 }
 
-func (self *Service) shutdown(_ context.Context) error {
+func (self *service) shutdown(_ context.Context) error {
 	self.cancelFunc()
 	return pubSub.Unsubscribe("Unsubscribe", self.pubSub, self.goFunctionCounter, self.subscribeChannel)
 }
 
-func (self *Service) start(_ context.Context) error {
+func (self *service) start(_ context.Context) error {
 	instanceData, err := self.onData()
 	if err != nil {
 		return err
@@ -145,7 +167,7 @@ func (self *Service) start(_ context.Context) error {
 	)
 }
 
-func (self *Service) goStart(instanceData IData) {
+func (self *service) goStart(instanceData IData) {
 	defer func(cmdChannel <-chan interface{}) {
 		//flush
 		for range cmdChannel {
@@ -189,7 +211,7 @@ loop:
 		case <-self.ctx.Done():
 			err := instanceData.ShutDown()
 			if err != nil {
-				self.Logger.Error(
+				self.logger.Error(
 					"error on done",
 					zap.Error(err))
 			}
@@ -216,13 +238,13 @@ func NewConnectionManagerService(
 ) IService {
 	localCtx, localCancelFunc := context.WithCancel(parentContext)
 
-	result := &Service{
+	result := &service{
 		parentContext:     parentContext,
 		ctx:               localCtx,
 		cancelFunc:        localCancelFunc,
 		cmdChannel:        make(chan interface{}, 32),
 		onData:            onData,
-		Logger:            logger,
+		logger:            logger,
 		ConnectionHelper:  ConnectionHelper,
 		pubSub:            pubSub,
 		goFunctionCounter: goFunctionCounter,

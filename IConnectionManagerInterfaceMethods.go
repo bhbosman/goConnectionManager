@@ -10,6 +10,7 @@ import (
 
 	errors "github.com/bhbosman/gocommon/errors"
 	model "github.com/bhbosman/gocommon/model"
+	rxgo "github.com/reactivex/rxgo/v2"
 )
 
 // Interface A Comment
@@ -659,6 +660,8 @@ type IConnectionManagerRegisterConnectionIn struct {
 	arg0 string
 	arg1 context.CancelFunc
 	arg2 context.Context
+	arg3 rxgo.NextFunc
+	arg4 rxgo.NextFunc
 }
 
 type IConnectionManagerRegisterConnectionOut struct {
@@ -679,7 +682,7 @@ type IConnectionManagerRegisterConnection struct {
 	outDataChannel chan IConnectionManagerRegisterConnectionOut
 }
 
-func NewIConnectionManagerRegisterConnection(waitToComplete bool, arg0 string, arg1 context.CancelFunc, arg2 context.Context) *IConnectionManagerRegisterConnection {
+func NewIConnectionManagerRegisterConnection(waitToComplete bool, arg0 string, arg1 context.CancelFunc, arg2 context.Context, arg3, arg4 rxgo.NextFunc) *IConnectionManagerRegisterConnection {
 	var outDataChannel chan IConnectionManagerRegisterConnectionOut
 	if waitToComplete {
 		outDataChannel = make(chan IConnectionManagerRegisterConnectionOut)
@@ -691,6 +694,8 @@ func NewIConnectionManagerRegisterConnection(waitToComplete bool, arg0 string, a
 			arg0: arg0,
 			arg1: arg1,
 			arg2: arg2,
+			arg3: arg3,
+			arg4: arg4,
 		},
 		outDataChannel: outDataChannel,
 	}
@@ -718,11 +723,11 @@ func (self *IConnectionManagerRegisterConnection) Close() error {
 	close(self.outDataChannel)
 	return nil
 }
-func CallIConnectionManagerRegisterConnection(context context.Context, channel chan<- interface{}, waitToComplete bool, arg0 string, arg1 context.CancelFunc, arg2 context.Context) (IConnectionManagerRegisterConnectionOut, error) {
+func CallIConnectionManagerRegisterConnection(context context.Context, channel chan<- interface{}, waitToComplete bool, arg0 string, arg1 context.CancelFunc, arg2 context.Context, arg3, arg4 rxgo.NextFunc) (IConnectionManagerRegisterConnectionOut, error) {
 	if context != nil && context.Err() != nil {
 		return IConnectionManagerRegisterConnectionOut{}, context.Err()
 	}
-	data := NewIConnectionManagerRegisterConnection(waitToComplete, arg0, arg1, arg2)
+	data := NewIConnectionManagerRegisterConnection(waitToComplete, arg0, arg1, arg2, arg3, arg4)
 	if waitToComplete {
 		defer func(data *IConnectionManagerRegisterConnection) {
 			err := data.Close()
@@ -893,7 +898,7 @@ func ChannelEventsForIConnectionManager(next IConnectionManager, event interface
 		return true, nil
 	case *IConnectionManagerRegisterConnection:
 		data := IConnectionManagerRegisterConnectionOut{}
-		data.Args0 = next.RegisterConnection(v.inData.arg0, v.inData.arg1, v.inData.arg2)
+		data.Args0 = next.RegisterConnection(v.inData.arg0, v.inData.arg1, v.inData.arg2, v.inData.arg3, v.inData.arg4)
 		if v.outDataChannel != nil {
 			v.outDataChannel <- data
 		}

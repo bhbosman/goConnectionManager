@@ -6,6 +6,7 @@ import (
 	"github.com/bhbosman/gocommon/messageRouter"
 	"github.com/bhbosman/gocommon/messages"
 	"github.com/bhbosman/gocommon/model"
+	"github.com/reactivex/rxgo/v2"
 	"go.uber.org/multierr"
 	"go.uber.org/zap"
 	"math"
@@ -130,12 +131,28 @@ func (self *data) NameConnection(id string, name string) error {
 	if ci, ok := self.connectionMap[id]; ok {
 		ci.Name = name
 		self.dirtyMap[id] = true
-		self.publishMessage(model.NewConnectionCreated(id, name, ci.CancelFunc, ci.ConnectionTime, ci.CancelContext))
+		self.publishMessage(
+			model.NewConnectionCreated(
+				id,
+				name,
+				ci.CancelFunc,
+				ci.ConnectionTime,
+				ci.CancelContext,
+				ci.NextFuncOutBoundChannel,
+				ci.NextFuncInBoundChannel,
+			),
+		)
 	}
 	return nil
 }
 
-func (self *data) RegisterConnection(id string, function context.CancelFunc, CancelContext context.Context) error {
+func (self *data) RegisterConnection(
+	id string,
+	function context.CancelFunc,
+	cancelContext context.Context,
+	nextFuncOutBoundChannel rxgo.NextFunc,
+	nextFuncInBoundChannel rxgo.NextFunc,
+) error {
 	if self.appContext.Err() != nil {
 		self.logger.Error(
 			"App Context in Error",
@@ -148,9 +165,25 @@ func (self *data) RegisterConnection(id string, function context.CancelFunc, Can
 		zap.String("Method", "RegisterConnection"),
 		zap.String("id", id))
 
-	value := model.NewConnectionInformation(id, function, CancelContext)
+	value := model.NewConnectionInformation(
+		id,
+		function,
+		cancelContext,
+		nextFuncOutBoundChannel,
+		nextFuncInBoundChannel,
+	)
 	self.connectionMap[id] = value
-	self.publishMessage(model.NewConnectionCreated(id, "(unassigned)", function, value.ConnectionTime, CancelContext))
+	self.publishMessage(
+		model.NewConnectionCreated(
+			id,
+			"(unassigned)",
+			function,
+			value.ConnectionTime,
+			cancelContext,
+			nextFuncOutBoundChannel,
+			nextFuncInBoundChannel,
+		),
+	)
 	return nil
 }
 
@@ -211,7 +244,6 @@ func (self *data) ConnectionInformationReceived(counters *model.PublishRxHandler
 }
 func (self *data) handleRefreshDataTo(msg *RefreshDataTo) {
 	for _, cm := range self.connectionMap {
-
 		msg.PubSubBag.Add(
 			model.NewConnectionCreated(
 				cm.Id,
@@ -219,17 +251,19 @@ func (self *data) handleRefreshDataTo(msg *RefreshDataTo) {
 				cm.CancelFunc,
 				cm.ConnectionTime,
 				cm.CancelContext,
+				cm.NextFuncOutBoundChannel,
+				cm.NextFuncInBoundChannel,
 			),
 		)
 		msg.PubSubBag.Add(
 			&model.ConnectionState{
-				ConnectionId:   cm.Id,
-				CancelContext:  cm.CancelContext,
-				CancelFunc:     cm.CancelFunc,
-				Name:           cm.Name,
-				ConnectionTime: cm.ConnectionTime,
-				Grid:           self.buildGridData(cm),
-				KeyValue:       self.buildKeyValueData(cm),
+				ConnectionId: cm.Id,
+				//CancelContext:  cm.CancelContext,
+				//CancelFunc:     cm.CancelFunc,
+				//Name:           cm.Name,
+				//ConnectionTime: cm.ConnectionTime,
+				Grid:     self.buildGridData(cm),
+				KeyValue: self.buildKeyValueData(cm),
 			},
 		)
 	}
@@ -241,13 +275,13 @@ func (self *data) handleEmptyQueue(msg *messages.EmptyQueue) error {
 			if connInfo, ok := self.connectionMap[s]; ok {
 				msg.ErrorHappen = !self.publishMessage(
 					&model.ConnectionState{
-						ConnectionId:   connInfo.Id,
-						CancelContext:  connInfo.CancelContext,
-						CancelFunc:     connInfo.CancelFunc,
-						Name:           connInfo.Name,
-						ConnectionTime: connInfo.ConnectionTime,
-						Grid:           self.buildGridData(connInfo),
-						KeyValue:       self.buildKeyValueData(connInfo),
+						ConnectionId: connInfo.Id,
+						//CancelContext:  connInfo.CancelContext,
+						//CancelFunc:     connInfo.CancelFunc,
+						//Name:           connInfo.Name,
+						//ConnectionTime: connInfo.ConnectionTime,
+						Grid:     self.buildGridData(connInfo),
+						KeyValue: self.buildKeyValueData(connInfo),
 					})
 			}
 		}
