@@ -17,7 +17,7 @@ type data struct {
 	dirtyMap                map[string]bool
 	appContext              context.Context
 	connectionMap           map[string]*model.ConnectionInformation
-	messageRouter           *messageRouter.MessageRouter
+	messageRouter           messageRouter.IMessageRouter
 	logger                  *zap.Logger
 	ConnectionManagerHelper IHelper
 	goFunctionCounter       GoFunctionCounter.IService
@@ -311,7 +311,7 @@ func (self *data) buildGridData(cm *model.ConnectionInformation) []model.LineDat
 
 func (self *data) buildKeyValueData(cm *model.ConnectionInformation) []model.KeyValue {
 	keys := make([]string, 0, len(cm.KeyValuesMap))
-	for key, _ := range cm.KeyValuesMap {
+	for key := range cm.KeyValuesMap {
 		keys = append(keys, key)
 	}
 	sort.Strings(keys)
