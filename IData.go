@@ -1,7 +1,7 @@
 package goConnectionManager
 
 import (
-	"github.com/bhbosman/gocommon/Services/IDataShutDown"
+	"github.com/bhbosman/gocommon/services/IDataShutDown"
 	"github.com/bhbosman/gocommon/services/ISendMessage"
 )
 

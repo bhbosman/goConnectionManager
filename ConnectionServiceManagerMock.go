@@ -8,8 +8,8 @@ import (
 	context "context"
 	reflect "reflect"
 
-	IFxService "github.com/bhbosman/gocommon/Services/IFxService"
 	model "github.com/bhbosman/gocommon/model"
+	IFxService "github.com/bhbosman/gocommon/services/IFxService"
 	gomock "github.com/golang/mock/gomock"
 )
 

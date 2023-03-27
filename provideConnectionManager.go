@@ -2,7 +2,7 @@ package goConnectionManager
 
 import (
 	"fmt"
-	"github.com/bhbosman/gocommon/Services/IFxService"
+	"github.com/bhbosman/gocommon/services/IFxService"
 	"go.uber.org/fx"
 )
 
