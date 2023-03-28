@@ -3,7 +3,7 @@ module github.com/bhbosman/goConnectionManager
 go 1.18
 
 require (
-	github.com/bhbosman/goCommsDefinitions v0.0.0-20230320101758-971a50fdbf8c
+	//github.com/bhbosman/goCommsDefinitions v0.0.0-20230320101758-971a50fdbf8c
 	github.com/bhbosman/gocommon v0.0.0-20230328140834-3b6f0ea2faaa
 	github.com/cskr/pubsub v1.0.2
 	github.com/golang/mock v1.6.0
@@ -35,6 +35,6 @@ replace github.com/golang/mock => github.com/bhbosman/gomock v1.6.1-0.2023030206
 
 replace github.com/bhbosman/gocommon => ../gocommon
 
-replace github.com/bhbosman/goCommsDefinitions => ../goCommsDefinitions
+//replace github.com/bhbosman/goCommsDefinitions => ../goCommsDefinitions
 
 replace github.com/cskr/pubsub => github.com/bhbosman/pubsub v1.0.3-0.20220802200819-029949e8a8af
