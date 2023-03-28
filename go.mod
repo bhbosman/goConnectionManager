@@ -3,8 +3,8 @@ module github.com/bhbosman/goConnectionManager
 go 1.18
 
 require (
-	github.com/bhbosman/goCommsDefinitions v0.0.0-20230308211643-24fe88b2378e
-	github.com/bhbosman/gocommon v0.0.0-20230320083256-4088c43f62a7
+	github.com/bhbosman/goCommsDefinitions v0.0.0-20230320101758-971a50fdbf8c
+	github.com/bhbosman/gocommon v0.0.0-20230328140834-3b6f0ea2faaa
 	github.com/cskr/pubsub v1.0.2
 	github.com/golang/mock v1.6.0
 	github.com/reactivex/rxgo/v2 v2.5.0
@@ -14,7 +14,7 @@ require (
 )
 
 require (
-	github.com/bhbosman/goConn v0.0.0-20230320102125-d7416dd8d6dc // indirect
+	github.com/bhbosman/goConn v0.0.0-20230327111455-7a39299fb0aa // indirect
 	github.com/bhbosman/goerrors v0.0.0-20220623084908-4d7bbcd178cf // indirect
 	github.com/cenkalti/backoff/v4 v4.1.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
