@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/bhbosman/goCommsDefinitions v0.0.0-20230308211643-24fe88b2378e
-	github.com/bhbosman/gocommon v0.0.0-20230328150634-566a0f916878
+	github.com/bhbosman/gocommon v0.0.0-20230328190055-dffeb142435d
 	github.com/cskr/pubsub v1.0.2
 	github.com/golang/mock v1.6.0
 	github.com/reactivex/rxgo/v2 v2.5.0
