@@ -35,4 +35,3 @@ replace github.com/golang/mock => github.com/bhbosman/gomock v1.6.1-0.2023030206
 
 replace github.com/cskr/pubsub => github.com/bhbosman/pubsub v1.0.3-0.20220802200819-029949e8a8af
 
-//replace github.com/bhbosman/goCommsDefinitions => ../goCommsDefinitions
