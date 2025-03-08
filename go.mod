@@ -25,7 +25,7 @@ require (
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/stretchr/testify v1.10.0 // indirect
 	github.com/teivah/onecontext v1.3.0 // indirect
-	go.uber.org/atomic v1.11.0 // indirect
+
 	go.uber.org/dig v1.18.1 // indirect
 	golang.org/x/net v0.37.0 // indirect
 	golang.org/x/sys v0.31.0 // indirect
