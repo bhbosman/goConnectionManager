@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	github.com/bhbosman/goCommsDefinitions v0.0.0-20250308144130-64993b60920c
-	github.com/bhbosman/gocommon v0.0.0-20250308155359-4baa9bec452e
+	github.com/bhbosman/gocommon v0.0.0-20250308194442-9c45d7859806
 	github.com/cskr/pubsub v1.0.2
 	github.com/golang/mock v1.6.0
 	github.com/reactivex/rxgo/v2 v2.5.0
