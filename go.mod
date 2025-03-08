@@ -3,7 +3,7 @@ module github.com/bhbosman/goConnectionManager
 go 1.24.0
 
 require (
-	github.com/bhbosman/goCommsDefinitions v0.0.0-20250308000247-4306925b3dfd
+	github.com/bhbosman/goCommsDefinitions v0.0.0-20250308074916-3e7c0d32b971
 	github.com/bhbosman/gocommon v0.0.0-20250308071735-43b385b00819
 	github.com/cskr/pubsub v1.0.2
 	github.com/golang/mock v1.6.0
